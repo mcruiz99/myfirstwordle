@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de Wordle</title>
+  <script src="/script.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .tablero {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .casilla {
+      width: 50px;
+      height: 50px;
+      border: 2px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .correcto {
+      background-color: green;
+      color: white;
+    }
+    .parcial {
+      background-color: orange;
+      color: white;
+    }
+    .incorrecto {
+      background-color: red;
+      color: white;
+    }
+    .teclado {
+      display: grid;
+      grid-template-columns: repeat(10, 40px);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tecla {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .boton-adivinar {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Juego de Wordle</h1>
+  <div id="tablero" class="tablero"></div>
+
+  <div id="teclado" class="teclado"></div>
+  <button class="boton-adivinar" onclick="adivinar()">Adivinar</button>
+  <div id="resultados"></div>
+
+  <script>
+    const palabraSecreta = "PLUMA"; // Cambia esta palabra para cambiar la palabra secreta
+    const filas = 6; // Número máximo de intentos
+    const columnas = 5; // Número de letras por intento
+    let intentoActual = [];
+    let filaActual = 0;
+
+    // Crear tablero vacío
+    const tableroDiv = document.getElementById('tablero');
+    function crearTablero() {
+      for (let i = 0; i < filas * columnas; i++) {
+        const casilla = document.createElement('div');
+        casilla.classList.add('casilla');
+        tableroDiv.appendChild(casilla);
+      }
+    }
+
+    // Crear teclado
+    const letras = 'QWERTYUIOPASDFGHJKLÑZXCVBNM';
+    const tecladoDiv = document.getElementById('teclado');
+    function crearTeclado() {
+      for (let letra of letras) {
+        const tecla = document.createElement('div');
+        tecla.classList.add('tecla');
+        tecla.textContent = letra;
+        tecla.onclick = () => seleccionarLetra(letra);
+        tecladoDiv.appendChild(tecla);
+      }
+    }
+
+    function seleccionarLetra(letra) {
+      if (intentoActual.length < columnas) {
+        intentoActual.push(letra);
+        actualizarTablero();
+      }
+    }
+
+    // Actualizar el tablero con las letras seleccionadas
+    function actualizarTablero() {
+      const casillas = document.querySelectorAll('.casilla');
+      for (let i = 0; i < columnas; i++) {
+        const index = filaActual * columnas + i;
+        casillas[index].textContent = intentoActual[i] || '';
+      }
+    }
+
+    // Comprobar el intento
+    function adivinar() {
+      if (intentoActual.length !== columnas) {
+        alert("Completa las 5 letras antes de adivinar.");
+        return;
+      }
+
+      const casillas = document.querySelectorAll('.casilla');
+      for (let i = 0; i < columnas; i++) {
+        const index = filaActual * columnas + i;
+        const letra = intentoActual[i];
+        if (letra === palabraSecreta[i]) {
+          casillas[index].classList.add('correcto');
+        } else if (palabraSecreta.includes(letra)) {
+          casillas[index].classList.add('parcial');
+        } else {
+          casillas[index].classList.add('incorrecto');
+        }
+      }
+
+      if (intentoActual.join('') === palabraSecreta) {
+        alert("¡Felicidades, has adivinado la palabra!");
+      } else if (filaActual < filas - 1) {
+        filaActual++;
+        intentoActual = [];
+      } else {
+        alert("Lo siento, has perdido. La palabra era: " + palabraSecreta);
+      }
+    }
+
+    // Inicialización
+    crearTablero();
+    crearTeclado();
+  </script>
+</body>
+</html>
